@@ -1,0 +1,260 @@
+
+--CREATING TABLES WITH VALIDATIONS AND CONSTRIANTS
+CREATE TABLE students (
+    student_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    gender CHAR(1) CHECK (gender IN ('M', 'F')),
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone_number VARCHAR(15),
+    enrollment_date DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE courses (
+    course_id SERIAL PRIMARY KEY,
+    course_name VARCHAR(100) NOT NULL,
+    course_code VARCHAR(10) UNIQUE NOT NULL,
+    credit_hours INT CHECK (credit_hours > 0)
+);
+
+CREATE TABLE instructors (
+    instructor_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    hire_date DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE enrollments (
+    enrollment_id SERIAL PRIMARY KEY,
+    student_id INT REFERENCES students(student_id) ON DELETE CASCADE,
+    course_id INT REFERENCES courses(course_id) ON DELETE CASCADE,
+    enrollment_date DATE DEFAULT CURRENT_DATE,
+    UNIQUE (student_id, course_id)
+);
+
+CREATE TABLE grades (
+    grade_id SERIAL PRIMARY KEY,
+    enrollment_id INT REFERENCES enrollments(enrollment_id) ON DELETE CASCADE,
+    grade CHAR(2) CHECK (grade IN ('A', 'B', 'C', 'D', 'F', 'I', 'W'))
+);
+
+CREATE TABLE course_instructors (
+    course_instructor_id SERIAL PRIMARY KEY,
+    course_id INT REFERENCES courses(course_id) ON DELETE CASCADE,
+    instructor_id INT REFERENCES instructors(instructor_id) ON DELETE CASCADE,
+    UNIQUE (course_id, instructor_id)
+);
+
+--INSERTING RECORDS INTO TABLES
+INSERT INTO students (first_name, last_name, date_of_birth, gender, email, phone_number, enrollment_date)
+VALUES
+('John', 'Sesay', '2001-05-14', 'M', 'john.doe@example.com', '1234567890', '2020-09-01'),
+('Rose', 'Kawa', '2002-03-22', 'F', 'jane.smith@example.com', '2345678901', '2020-09-01'),
+('Michael', 'Kamara', '2001-11-10', 'M', 'michael.johnson@example.com', '3456789012', '2021-01-15'),
+('Gifty', 'Davis', '2003-07-05', 'F', 'emily.davis@example.com', '4567890123', '2021-09-01'),
+('Daniel', 'Kanu', '2002-12-20', 'M','daniel@gmail.com', '5678901234', '2020-09-01'), -- NULL email
+('Sarah', 'Turay', '2001-08-09', 'F', 'sarah.miller@example.com', NULL, '2020-09-01'), -- NULL phone
+('Abdul', 'Wilson', '2002-10-11', 'M', 'david.wilson@example.com', '6789012345', '2020-09-01'),
+('Philip', 'Moore', '2003-01-25', 'F', 'olivia.moore@example.com', NULL, '2021-09-01'), -- NULL phone
+('Saidu', 'Taylor', '2001-09-30', 'M','saidu@gmail.com', '8901234567', '2021-01-15'), -- NULL email
+('Sophia', 'Anderson', '2002-06-18', 'F', 'sophia.anderson@example.com', '9012345678', '2020-09-01');
+
+
+INSERT INTO courses (course_name, course_code, credit_hours)
+VALUES
+('Introduction to Computer Science', 'CS101', 3),
+('Database Systems', 'CS201', 4),
+('Mathematics for Computing', 'MA101', 3),
+('English Composition', 'EN101', 2),
+('Data Structures and Algorithms', 'CS301', 4),
+('Operating Systems', 'CS401', 4),
+('Software Engineering', 'CS501', 3),
+('Web Development', 'CS601', 3),
+('Computer Networks', 'CS701', 3),
+('Cyber Security Fundamentals', 'CS801', 3);
+
+
+INSERT INTO instructors (first_name, last_name, email, hire_date)
+VALUES
+('Alice', 'Williams', 'alice.williams@example.com', '2018-08-15'),
+('Robert', 'Taylor', 'robert.taylor@example.com', '2019-02-10'),
+('Sophia', 'Martinez', 'sophia.martinez@example.com', '2020-06-01'),
+('Henry', 'Adams', 'henry.adams@example.com', '2021-04-20'),
+('Emma', 'Scott', 'emma.scott@example.com', '2019-11-10'),
+('Lucas', 'Hernandez', 'lucas.hernandez@example.com', '2020-01-25'),
+('Chloe', 'King', 'chloe.king@example.com', '2018-03-05'),
+('James', 'Wright', 'james.wright@example.com', '2021-07-18'),
+('Olivia', 'Green', 'olivia.green@example.com', '2022-01-12'),
+('Ethan', 'Baker', 'ethan.baker@example.com', '2020-05-22');
+
+
+INSERT INTO course_instructors (course_id, instructor_id)
+VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+INSERT INTO enrollments (student_id, course_id, enrollment_date)
+VALUES
+(6, 1, '2020-09-01'),
+(7, 2, '2020-09-01'),
+(8, 3, '2021-01-15'),
+(9, 4, '2021-09-01'),
+(10, 5, '2020-09-01'),
+(11, 6, '2020-09-01'),
+(12, 7, '2020-09-01'),
+(13, 8, '2021-09-01'),
+(14, 9, '2021-01-15'),
+(15, 10, '2020-09-01');
+
+INSERT INTO grades (enrollment_id, grade)
+VALUES
+(11, 'A'),
+(12, 'B'),
+(13, NULL), -- missing grade
+(14, 'C'),
+(15, 'B'),
+(16, NULL), -- missing grade
+(17, 'A'),
+(18, 'B'),
+(19, NULL), -- missing grade
+(20, 'A');
+
+--FILTERING RECORDS
+SELECT * FROM enrollments; --RETRIEVING ALL RECORDS FROM A TABLE
+
+SELECT first_name || ' ' || last_name AS full_name
+FROM students; --CONCATINATING STRINGS
+
+--WHERE CLAUSE MANIPULATIONS
+SELECT * FROM students
+WHERE gender = 'F';
+
+UPDATE students
+SET first_name = 'Philisha'
+WHERE first_name = 'Philip';
+
+DELETE FROM students
+WHERE student_id = 15;
+
+ALTER TABLE students
+ALTER COLUMN date_of_birth DROP NOT NULL;
+
+
+ALTER TABLE students
+ALTER COLUMN date_of_birth SET NOT NULL;
+
+
+--JOINS
+SELECT instructors.first_name ||'  '|| instructors.last_name AS instructor_full_name, 
+course_instructors.course_id AS instructors_course_id
+FROM instructors
+INNER JOIN course_instructors ON course_instructors.instructor_id = instructors.instructor_id;
+
+-- Shows only students who are enrolled in a course.
+SELECT 
+    s.student_id,
+    s.first_name || ' ' || s.last_name AS student_name,
+    c.course_name,
+    e.enrollment_date
+FROM students s
+ INNER JOIN enrollments e 
+    ON s.student_id = e.student_id
+INNER JOIN courses c 
+    ON e.course_id = c.course_id;
+
+--AGGREGATIONS
+--Find courses that have at least 1 student enrolled and show how many students each has
+SELECT 
+  c.course_name,
+  COUNT(e.student_id) AS student_count
+FROM courses c
+JOIN enrollments e ON c.course_id = e.course_id
+GROUP BY c.course_name
+HAVING COUNT(e.student_id) >= 1
+ORDER BY student_count DESC;
+
+--Union
+--Get a combined list of student first names and instructor first names (no duplicates)
+SELECT first_name FROM students
+UNION
+SELECT first_name FROM instructors;
+
+-- LIMIT AND OFFSET
+--Skip the first 5 students and get the next 5
+SELECT student_id, first_name, last_name
+FROM students
+ORDER BY last_name
+LIMIT 5 OFFSET 5;
+
+--Subquery
+--List students who enrolled after the earliest enrollment date in the system
+SELECT first_name, last_name, enrollment_date
+FROM students
+WHERE enrollment_date > (
+  SELECT MIN(enrollment_date) FROM students
+);
+
+-- Create a composite index on grades.enrollment_id and grades.grade
+SELECT * FROM students;
+CREATE INDEX students_first_name_idx ON students(first_name);
+
+EXPLAIN ANALYZE
+SELECT *
+FROM students
+WHERE first_name = 'John';
+
+SELECT * 
+FROM pg_indexes
+WHERE tablename = 'students';
+
+DROP INDEX students_email_idx;
+
+--creating a view
+CREATE OR REPLACE VIEW recent_students AS
+SELECT student_id, first_name, last_name, email, enrollment_date
+FROM students
+WHERE enrollment_date >= '2020-01-01';
+
+SELECT * FROM recent_students;
+
+DROP VIEW recent_students;
+
+BEGIN;
+
+-- Deduct 100 from account 1
+UPDATE accounts
+SET balance = balance - 100
+WHERE account_id = 1;
+
+-- Add 100 to account 2
+UPDATE accounts
+SET balance = balance + 100
+WHERE account_id = 2;
+
+COMMIT;
+
+ROLLBACK;
+
+WITH enrollment_counts AS (
+
+  SELECT student_id, COUNT(*) AS course_count
+  FROM enrollments
+  GROUP BY student_id
+)
+SELECT s.student_id, s.first_name, s.last_name, ec.course_count
+FROM students s
+JOIN enrollment_counts ec ON s.student_id = ec.student_id
+WHERE ec.course_count > 1;
+
+
+
