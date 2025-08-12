@@ -1,0 +1,52 @@
+CREATE TABLE employees (
+id integer primary key,
+first_name varchar,
+last_name varchar,
+salary numeric
+);
+
+INSERT INTO employees (id, first_name, last_name, salary)
+VALUES (1, 'John', 'Doe', '50000');
+
+SELECT * FROM employees;
+
+SELECT first_name, last_name, salary FROM employees WHERE salary > 60000;
+
+UPDATE employees 
+SET salary = 55000
+WHERE id = 1;
+
+DELETE FROM employees
+WHERE id = 1;
+
+CREATE TABLE departments (
+dept_id integer primary key,
+dept_name varchar
+);
+
+ALTER TABLE employees
+ADD COLUMN dept_id INTEGER REFERENCES departments(dept_id);
+
+SELECT first_name, last_name, dept_name FROM employees
+FULL JOIN departments ON departments.dept_id = employees.dept_id;
+
+SELECT first_name, last_name FROM employees
+WHERE dept_id IS NULL;
+
+SELECT dept_name, COUNT(*) AS enployee_count FROM Employees 
+GROUP BY dept_id;
+
+SELECT * FROM employees 
+ORDER BY salary DESC;
+
+SELECT AVG(salary) AS Average_salary
+FROM employees;
+
+ALTER TABLE employees
+ADD check(salary>0);
+
+SELECT first_name, last_name FROM employees
+WHERE first_name LIKE "J%";
+
+CREATE INDEX employees_last_name_idx ON employees(id);
+
