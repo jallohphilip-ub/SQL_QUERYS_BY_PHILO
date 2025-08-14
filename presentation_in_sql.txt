@@ -1,0 +1,93 @@
+CREATE TABLE postgrad(
+	id SERIAL PRIMARY KEY,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	email VARCHAR(50) UNIQUE,
+	phone INT
+
+);
+
+CREATE TABLE tech(
+	id SERIAL PRIMARY KEY,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	email VARCHAR(50) UNIQUE,
+	phone INTEGER
+
+);
+
+CREATE TABLE lecture(
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(50),
+	 description VARCHAR(50),
+	category VARCHAR(50),
+	understanding BOOLEAN 
+
+);
+
+INSERT INTO postgrad (first_name, last_name, email, phone) VALUES
+('Abdulai', 'Turay', 'abdulai@example.com', 079175234),
+('John', 'Sesay', 'john@example.com', 077890234),
+('Philli', 'Jalloh', 'philli@example.com', 079175563),
+('Alex', 'Turay', 'alexi@example.com', 088767534),
+('Sufyan', 'Turay', 'sufyan@example.com', 030875234);
+
+INSERT INTO tech (first_name, last_name, email, phone) VALUES
+('Strange', 'Turay', 'strange@example.com', 079175674),
+('Momoh', 'Sesay', 'momoh@example.com', 077098234),
+('Max', 'Smith', 'max@example.com', 079595563),
+('Abu', 'kamara', 'abu@example.com', 088767765),
+('Saka', 'Bukayo', 'saka@example.com', 030812334);
+
+INSERT INTO lecture (name, description, category, understanding) VALUES
+('lec_1', 'masters in git', 'git', true),
+('lec_2', 'masters in sql', 'sql', false),
+('lec_3', 'masters in java', 'java', true),
+('lec_4', 'masters in git', 'git', false),
+('lec_5', 'masters in sql', 'sql', true);
+
+ALTER TABLE tech ADD COLUMN postgres_id INTEGER REFERENCES postgrad(id);
+
+SELECT postgrad.first_name, tech.last_name FROM tech 
+INNER JOIN postgrad ON postgrad.id = tech.postgres_id
+LIMIT 3;
+
+INSERT INTO tech (first_name, last_name, email, phone, postgres_id) VALUES
+('Strange', 'Turay', 'range@example.com', 079175674, 6 ),
+('Momoh', 'Sesay', 'ooh@example.com', 077098234, 7),
+('Max', 'Smith', 'a@example.com', 079595563, 2),
+('Abu', 'kamara', 'u@example.com', 088767765, 8);
+
+ALTER TABLE tech ADD COLUMN  lecture_id INTEGER REFERENCES lecture(id);
+
+INSERT INTO postgrad (first_name, last_name, email, phone) VALUES
+('Abdulai', 'Turay', 'bdulai@example.com', 079175234),
+('John', 'Sesay', 'jon@example.com', 077890234),
+('Philli', 'Jalloh', 'phlli@example.com', 079175563),
+('Alex', 'Turay', 'alei@example.com', 088767534);
+
+
+INSERT INTO tech (first_name, last_name, email, phone, postgres_id, lecture_id ) VALUES
+('Strange', 'Turay', 'yrange@example.com', 079175674, 6, 3 ),
+('Momoh', 'Sesay', 'looh@example.com', 077098234, 7, 4),
+('Max', 'Smith', 'ja@example.com', 079595563, 2, 2),
+('Abu', 'kamara', 'mu@example.com', 088767765, 8, 5);
+
+SELECT tech.first_name, postgrad.first_name, lecture.category
+FROM postgrad
+FULL JOIN tech ON postgrad.id = postgres_id
+INNER JOIN lecture ON lecture.id = tech.lecture_id
+GROUP BY (tech.first_name, postgrad.first_name, lecture.category);
+
+SELECT first_name, category, understanding,
+	CASE
+		WHEN understanding = true THEN 'COMPLETED'
+		WHEN understanding = false THEN 'NOT COMPLETED'
+		ELSE 'NOT IN THE COURSE'
+	END AS course_status
+
+	FROM lecture
+JOIN tech ON tech.id = lecture.id;
+
+SELECT * FROM tech 
+WHERE phone :: text LIKE '079%';
